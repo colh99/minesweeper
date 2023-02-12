@@ -7,7 +7,7 @@ class Director {
 private:
 	int width = 8;
 	int height = 8;
-	int mineCount = 10; 
+	int mineCount = 8; 
 
 public:
 	// Constructors
@@ -23,6 +23,6 @@ public:
 
 	void displayBoard(vector<Cell> board, int width, int height);
 
-	void checkAdjacentCells();
+	vector<Cell> checkAdjacentCells(Director director, vector<Cell> board, int chosenCell);
 
 };

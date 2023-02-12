@@ -1,5 +1,7 @@
 #include "cell.h"
 
+
+// CONSTRUCTORS
 Cell::Cell()
 {
 }

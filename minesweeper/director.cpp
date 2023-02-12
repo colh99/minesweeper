@@ -90,38 +90,155 @@ int Director::getMineCount() const
 
  void Director::displayBoard(vector<Cell> board, int width, int height)
  {
-	 cout << "     1  2  3  4  5  6  7  8  " << endl; // X axis labels
-	 cout << "     _  _  _  _  _  _  _  _  ";
-
+	 cout << "   X  ";
+	 for (int i = 0; i < width; i++)
+	 {
+		cout << i + 1 << "   "; // X axis labels
+	 }
+	 
+	 cout << endl;
+	 cout << " Y  ";
+	 for (int i = 0; i < width; i++)
+	 {
+		cout << " _ _";
+	 }
+	 
+	 int rows = 0;
 	 for (int i = 0; i < width * height; i++)
 	 {
-		 if (i % 8 == 0) // Determines end of line
+		 if (i % width == 0) // Checks for beginning of the row
 		 {
 			 cout << endl;
-			 cout << " " << i / 8 << "  "; // Y axis labels
+			 rows++;
+			 if (rows > 9)
+			 {
+				 cout << "" << rows << "  |"; // Y axis labels
+			 }
+			 else
+			 {
+				cout << " " << rows << "  |"; // Y axis labels
+			 }
+			 
 		 }
+
+		
 
 		 if (board[i].getVisibility() == true)
 		 {
 			 if (board[i].getContainsMine() == true)
 			 {
-				 cout << "|X|";
-
+				 cout << "_X_";
+				 cout << "|";
+			 }
+			 else if (board[i].getValue() == 0)
+			 {
+				 cout << "_-_";
+				 cout << "|";
 			 }
 			 else
 			 {
-				 cout << "|" << board[i].getValue() << "|";
+				 cout << "_" << board[i].getValue() << "_";
+				 cout << "|";
 			 }
 		 }
 		 else
 		 {
-			 wcout << L"|_|"; // Not visible cells should display as blank
+			 cout << "_ _"; // Not visible cells should display as blank
+			 cout << "|";
 		 }
-
-		 
 	 }
+
+	 cout << endl;
  }
 
+ vector<Cell> Director::checkAdjacentCells(Director director, vector<Cell> board, int chosenCell)
+ {
+	 if (board[chosenCell].getVisibility() == true) // Return immediately if it's already been checked
+	 {
+		 return board;
+	 }
+
+	 board[chosenCell].setVisibility(true);
+
+	 int up = director.getWidth() * -1;
+	 int down = director.getWidth();
+	 int left = -1;
+	 int right = 1;
+
+	 vector<int> directions;
+
+	 if (chosenCell + 1 > director.getWidth()) // Check up for edge
+	 {
+		 directions.push_back(chosenCell + up);
+	 }
+
+	 if (chosenCell < board.size() - director.getWidth()) // Check down for edge
+	 {
+		 directions.push_back(chosenCell + down);
+	 }
+
+	 if (chosenCell % width != 0) // Check left for edge
+	 {
+		 directions.push_back(chosenCell + left);
+	 }
+
+	 if (chosenCell % width != width - 1) // Check right for edge
+	 {
+		 directions.push_back(chosenCell + right);
+	 }
+
+	 if (directions.size() == 4) // If all previous are included, add all diagonals
+	 {
+		 directions.push_back(chosenCell + down + right);
+		 directions.push_back(chosenCell + down + left);
+		 directions.push_back(chosenCell + up + right);
+		 directions.push_back(chosenCell + up + left);
+	 }
+	 else // Check for diagonals
+	 {
+		 if (chosenCell + 1 > director.getWidth() && chosenCell % width != 0) // Check up-left
+		 {
+			 directions.push_back(chosenCell + up + left);
+		 }
+
+		 if (chosenCell + 1 > director.getWidth() && chosenCell % width != width - 1) // Check up-right
+		 {
+			 directions.push_back(chosenCell + up + right);
+		 }
+
+		 if (chosenCell < board.size() - director.getWidth() && chosenCell % width != 0) // Check for down-left
+		 {
+			 directions.push_back(chosenCell + down + left);
+		 }
+
+		 if (chosenCell < board.size() - director.getWidth() && chosenCell % width != width - 1) // Check for down-right
+		 {
+			 directions.push_back(chosenCell + down + right);
+		 }
+
+	 }
+
+	 for (int i = 0; i < directions.size(); i++) // Check each direction that we added to the directions vector, for mines
+	 {
+		 if (board[directions[i]].getContainsMine() == true)
+		 {
+			 board[chosenCell].setValue(board[chosenCell].getValue() + 1);
+		 }
+	 }
+
+	 if (board[chosenCell].getValue() == 0) // Recursive
+	 {
+		 for (int i = 0; i < directions.size() - 1; i++) 
+		 {
+			 if (board[directions[i]].getValue() == 0)
+			 {
+				 board = checkAdjacentCells(director, board, directions[i]);
+			 }
+		 }
+	 }
+
+	 return board;
+ }
 
 
 // Clicking a cell begins a recursive function. First it checks if the clicked cell has a mine (value of -1).
