@@ -3,14 +3,15 @@
 
 #include <iostream>
 #include "director.h"
+#include "cell.h"
 
 int main()
 {
-    std::cout << "MINESWEEPER" << endl;
+    std::cout << "          MINESWEEPER" << endl;
 
     Director director = Director();
-    
-    vector<int> board = director.distributeMines(director.board, director.getWidth(), director.getHeight(), director.getMineCount());
+   
+    vector<Cell> board = director.distributeMines(director);
     
     director.displayBoard(board, director.getWidth(), director.getHeight());
 

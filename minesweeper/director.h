@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "cell.h"
 using namespace std;
 
 class Director {
@@ -11,18 +12,16 @@ private:
 public:
 	// Constructors
 	Director(); // for standard game rules
-	Director(vector<int> board, int width, int height, int mineCount); // for alternate game rules
+	Director(int width, int height, int mineCount); // for alternate game rules
 	
 	int getWidth() const;
 	int getHeight() const;
 	int getMineCount() const;
-	
-	vector<int> board;
 
 	
-	vector<int> distributeMines(vector<int> board, int width, int height, int mineCount);
+	vector<Cell> distributeMines(Director director);
 
-	void displayBoard(vector<int> board, int width, int height);
+	void displayBoard(vector<Cell> board, int width, int height);
 
 	void checkAdjacentCells();
 

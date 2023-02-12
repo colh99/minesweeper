@@ -1,4 +1,5 @@
-#include "director.h"
+﻿#include "director.h"
+#include "cell.h"
 #include <vector>
 #include <iostream>
 #include <set>
@@ -13,7 +14,7 @@ Director::Director()
 }
 
 
-Director::Director(vector<int> board, int width, int height, int mineCount)
+Director::Director(int width, int height, int mineCount)
 {
 }
 
@@ -38,8 +39,12 @@ int Director::getMineCount() const
 
 
 // GAMEPLAY
- vector<int> Director::distributeMines(vector<int> board, int width, int height, int mineCount)
+ vector<Cell> Director::distributeMines(Director director)
 {
+	 int width = director.getWidth();
+	 int height = director.getHeight();
+	 int mineCount = director.getMineCount();
+	 
 	 int expectedSize = width * height;
 	 assert(("MESSAGE: There should be enough cells to fit all the mines", mineCount < expectedSize));
 
@@ -51,7 +56,9 @@ int Director::getMineCount() const
 		 mineLocations.insert(rand() % expectedSize); // mineLocations is a set so duplicates are discarded.
 	 }
 
-	 // The mineLocations set is emptied into the board. Indices where a mine exists are assigned a value of -1
+	 vector<Cell> board;
+
+	 // The mineLocations set is emptied into the board.
 	 while (board.size() < expectedSize)
 	 {
 		 if (mineLocations.size() != 0)
@@ -60,17 +67,20 @@ int Director::getMineCount() const
 
 			if (board.size() == *setIterator)
 			{
-				board.push_back(-1); // -1 denotes a mine!
+				Cell cell = Cell(true, false, 0);
+				board.push_back(cell); 
 				mineLocations.erase(mineLocations.begin());
 			}
 			else
 			{
-				board.push_back(0);
+				Cell cell = Cell(false, false, 0);
+				board.push_back(cell);
 			}
 		 }
 		 else 
 		 {
-			board.push_back(0); // For now, 0 denotes no mine at this index. Later, this will change to represent the number of adjacent mines.
+			Cell cell = Cell(false, false, 0);
+			board.push_back(cell); // For now, 0 denotes no mine at this index. Later, this will change to represent the number of adjacent mines.
 		 }
 	 }
 
@@ -78,18 +88,40 @@ int Director::getMineCount() const
 }
 
 
- void Director::displayBoard(vector<int> board, int width, int height)
+ void Director::displayBoard(vector<Cell> board, int width, int height)
  {
+	 cout << "     1  2  3  4  5  6  7  8  " << endl; // X axis labels
+	 cout << "     _  _  _  _  _  _  _  _  ";
+
 	 for (int i = 0; i < width * height; i++)
 	 {
-		 if (i % 8 == 0)
+		 if (i % 8 == 0) // Determines end of line
 		 {
 			 cout << endl;
+			 cout << " " << i / 8 << "  "; // Y axis labels
 		 }
-		 cout << board[i];
+
+		 if (board[i].getVisibility() == true)
+		 {
+			 if (board[i].getContainsMine() == true)
+			 {
+				 cout << "|X|";
+
+			 }
+			 else
+			 {
+				 cout << "|" << board[i].getValue() << "|";
+			 }
+		 }
+		 else
+		 {
+			 wcout << L"|_|"; // Not visible cells should display as blank
+		 }
+
 		 
 	 }
  }
+
 
 
 // Clicking a cell begins a recursive function. First it checks if the clicked cell has a mine (value of -1).
